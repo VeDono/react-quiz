@@ -1,4 +1,5 @@
-import './index.scss';
+import { useState } from 'react'
+import './index.scss'
 
 const questions = [
   {
@@ -8,7 +9,11 @@ const questions = [
   },
   {
     title: 'Компонент - это ... ',
-    variants: ['приложение', 'часть приложения или страницы', 'то, что я не знаю что такое'],
+    variants: [
+      'приложение',
+      'часть приложения или страницы',
+      'то, что я не знаю что такое',
+    ],
     correct: 1,
   },
   {
@@ -16,45 +21,77 @@ const questions = [
     variants: [
       'Это простой HTML',
       'Это функция',
-      'Это тот же HTML, но с возможностью выполнять JS-код',
+      'Это HTML-подобный синтаксис для React',
     ],
     correct: 2,
   },
-];
+]
 
-function Result() {
+function Result({ correct }) {
   return (
     <div className="result">
       <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
-      <h2>Вы отгадали 3 ответа из 10</h2>
-      <button>Попробовать снова</button>
+      <h2>{`Вы отгадали ${correct} ответа из ${questions.length}`}</h2>
+      {/* Такой вариант был сделан лишь ради практики и является строго не правильным
+          поскольку страница не должна перезагружаться */}
+      <a href="/">
+        <button>Попробовать снова</button>
+      </a>
     </div>
-  );
+  )
 }
 
-function Game() {
+function Game({ question, stepIncrement, step }) {
+  const progression = Math.round((step / questions.length) * 100)
+
   return (
     <>
       <div className="progress">
-        <div style={{ width: '50%' }} className="progress__inner"></div>
+        <div
+          style={{ width: `${progression}%` }}
+          className="progress__inner"
+        ></div>
       </div>
-      <h1>Что такое useState?</h1>
+      <h1>{question.title}</h1>
       <ul>
-        <li>Это функция для хранения данных компонента</li>
-        <li>Это глобальный стейт</li>
-        <li>Это когда на ты никому не нужен</li>
+        {question.variants.map((variant, index) => (
+          <li onClick={() => stepIncrement(index)} key={index}>
+            {variant}
+          </li>
+        ))}
       </ul>
     </>
-  );
+  )
 }
 
 function App() {
+  const [step, setStep] = useState(0)
+  const [correct, setCorrect] = useState(0)
+  const question = questions[step]
+
+  const stepIncrementHandler = (index) => {
+    console.log(step, index)
+    setStep(step + 1)
+
+    if (index === question.correct) {
+      setCorrect(correct + 1)
+    }
+  }
+
   return (
     <div className="App">
-      <Game />
+      {step != questions.length ? (
+        <Game
+          step={step}
+          question={question}
+          stepIncrement={stepIncrementHandler}
+        />
+      ) : (
+        <Result correct={correct} />
+      )}
       {/* <Result /> */}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

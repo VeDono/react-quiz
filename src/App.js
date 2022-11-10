@@ -80,7 +80,7 @@ function App() {
 
   return (
     <div className="App">
-      {step != questions.length ? (
+      {step !== questions.length ? (
         <Game
           step={step}
           question={question}
